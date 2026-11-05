@@ -85,29 +85,66 @@ The site deploys automatically: every push to `main` runs `.github/workflows/dep
 which builds the site and publishes it to GitHub Pages. You can follow it in the
 repository's **Actions** tab.
 
+The site lives at **<https://louisfh.com>**. **louisfreelandhaynes.com** is not served by
+GitHub. It forwards to louisfh.com from the registrar.
+
 ### First-time setup
 
-1. Create a GitHub repository named **`louisfh.github.io`**. That name makes the site
-   live at <https://louisfh.github.io>.
-2. Push this folder to it:
+**1. GitHub repository.** Create a repository named **`louisfh.github.io`** and push this
+folder to it:
 
-   ```bash
-   git remote add origin https://github.com/louisfh/louisfh.github.io.git
-   git push -u origin main
-   ```
+```bash
+git remote add origin https://github.com/louisfh/louisfh.github.io.git
+git push -u origin main
+```
 
-3. In the repository on GitHub, open **Settings → Pages**, and under **Build and deployment →
-   Source** choose **GitHub Actions**.
-4. Push again, or run the workflow manually from the **Actions** tab. The site is live a
-   minute or two later.
+In the repository, open **Settings → Pages**, and under **Build and deployment → Source**
+choose **GitHub Actions**. The first deploy runs on the next push, or you can start it from
+the **Actions** tab.
 
-**Different repository name?** If you name the repository anything else (e.g. `website`), the
-site is served from `https://louisfh.github.io/website/`. Set `base: '/website'` in
-`astro.config.mjs` to match.
+**2. Verify the domain on GitHub.** In your *account* settings (not the repository's), open
+**Settings → Pages → Add a domain** and enter `louisfh.com`. GitHub gives you a `TXT` record
+to add at your registrar. Once it is verified, nobody else can attach louisfh.com to their
+own Pages site.
 
-**Custom domain?** Set `site` in `astro.config.mjs` to your domain (e.g.
-`https://www.example.com`). Add a file `public/CNAME` containing just the domain, then set the
-domain under **Settings → Pages** and follow GitHub's DNS instructions.
+**3. DNS for louisfh.com** at your registrar. Remove any existing parking or forwarding
+records for the domain, then add:
+
+| Type | Host | Value |
+| --- | --- | --- |
+| `A` | `@` | `185.199.108.153` |
+| `A` | `@` | `185.199.109.153` |
+| `A` | `@` | `185.199.110.153` |
+| `A` | `@` | `185.199.111.153` |
+| `AAAA` | `@` | `2606:50c0:8000::153` |
+| `AAAA` | `@` | `2606:50c0:8001::153` |
+| `AAAA` | `@` | `2606:50c0:8002::153` |
+| `AAAA` | `@` | `2606:50c0:8003::153` |
+| `CNAME` | `www` | `louisfh.github.io` |
+
+GitHub redirects `www.louisfh.com` to `louisfh.com` automatically.
+
+**4. Custom domain in the repository.** `public/CNAME` already contains `louisfh.com`, and
+the deploy publishes it, so **Settings → Pages → Custom domain** should fill itself in after
+the first deploy (enter it there if it doesn't). Once the DNS check passes and the
+certificate is issued (minutes to about an hour), tick **Enforce HTTPS**.
+
+**5. Forward louisfreelandhaynes.com.** At the registrar, set up URL forwarding:
+
+- Destination: `https://louisfh.com`
+- Type: **permanent (301)**, not "masked" or "frame" forwarding
+- Path forwarding on, so `louisfreelandhaynes.com/cv` lands on `louisfh.com/cv`
+- Cover both `louisfreelandhaynes.com` and `www.louisfreelandhaynes.com`
+
+Then open `https://louisfreelandhaynes.com` (with **https**) in a browser. Some registrars
+only forward plain `http://` and show a certificate warning for `https://`. If that happens,
+move that domain's DNS to Cloudflare's free plan and add a redirect rule there, which
+handles HTTPS.
+
+Keep both domains on auto-renew.
+
+**Changing the domain later:** update `site` in `astro.config.mjs` and the single line in
+`public/CNAME`, then update DNS.
 
 ### Day-to-day
 
