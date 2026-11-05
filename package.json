@@ -1,0 +1,19 @@
+{
+  "name": "academic-site",
+  "version": "1.0.0",
+  "description": "Personal academic website",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview"
+  },
+  "type": "module",
+  "dependencies": {
+    "@retorquere/bibtex-parser": "^13.0.15",
+    "astro": "^7.4.7"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22.23.4"
+  }
+}

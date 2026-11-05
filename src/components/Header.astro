@@ -1,0 +1,117 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { url } from '../lib/site';
+
+interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+
+const nav = [
+  { href: '/', label: 'Home' },
+  { href: '/publications', label: 'Publications' },
+  { href: '/cv', label: 'CV' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const here = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => here === (url(href).replace(/\/$/, '') || '/');
+---
+
+<header class="site-header">
+  <div class="inner">
+    <a class="site-name" href={url('/')}>{name}</a>
+    <nav aria-label="Main">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={url(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .inner {
+    max-width: var(--page);
+    margin: 0 auto;
+    padding: 0.75rem var(--gutter);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'name toggle'
+      'nav nav';
+    align-items: center;
+    gap: 0.25rem 1rem;
+  }
+
+  .site-name {
+    grid-area: name;
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  nav {
+    grid-area: nav;
+  }
+
+  :global(.theme-toggle) {
+    grid-area: toggle;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0 0 0 -0.6rem;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: none;
+  }
+
+  nav a {
+    display: block;
+    padding: 0.5rem 0.6rem;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: var(--radius);
+  }
+
+  nav a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+
+  nav a[aria-current='page'] {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+
+  @media (min-width: 44rem) {
+    .inner {
+      grid-template-columns: 1fr auto auto;
+      grid-template-areas: 'name nav toggle';
+    }
+
+    ul {
+      margin: 0;
+    }
+  }
+</style>

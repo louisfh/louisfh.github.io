@@ -1,0 +1,79 @@
+---
+import type { Publication } from '../lib/bibtex';
+
+interface Props {
+  pub: Publication;
+}
+
+const { pub } = Astro.props;
+const n = pub.authors.length;
+---
+
+<li class="pub">
+  <p class="title" set:html={pub.title} />
+  {
+    n > 0 && (
+      <p class="authors">
+        {pub.authors.map((a, i) => (
+          <>
+            {a.isMe ? <strong>{a.name}</strong> : a.name}
+            {i < n - 2 ? ', ' : i === n - 2 ? (n > 2 ? ', and ' : ' and ') : ''}
+          </>
+        ))}
+      </p>
+    )
+  }
+  {pub.venue && <p class="venue" set:html={pub.venue} />}
+  {
+    pub.links.length > 0 && (
+      <ul class="pub-links" aria-label="Links">
+        {pub.links.map((l) => (
+          <li>
+            <a class="button" href={l.href}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</li>
+
+<style>
+  .pub {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pub:last-child {
+    border-bottom: none;
+  }
+
+  .pub p {
+    margin: 0;
+  }
+
+  .title {
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .authors,
+  .venue {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .authors strong {
+    color: var(--text);
+  }
+
+  .pub-links {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+</style>

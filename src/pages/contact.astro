@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import LinkList from '../components/LinkList.astro';
+import { getProfile } from '../lib/site';
+
+const { name, email, office, links } = (await getProfile()).data;
+---
+
+<Base title="Contact" description={`How to contact ${name}.`}>
+  <h1>Contact</h1>
+
+  {
+    email && (
+      <p class="email">
+        The best way to reach me is by email:{' '}
+        <a href={`mailto:${email}`}>{email}</a>
+      </p>
+    )
+  }
+
+  {
+    office && (
+      <section aria-labelledby="office">
+        <h2 id="office">Office</h2>
+        <address class="office">
+          <Icon name="pin" />
+          <span>{office.trim()}</span>
+        </address>
+      </section>
+    )
+  }
+
+  {
+    links.length > 0 && (
+      <section aria-labelledby="elsewhere">
+        <h2 id="elsewhere">Elsewhere</h2>
+        <LinkList links={links} />
+      </section>
+    )
+  }
+</Base>
+
+<style>
+  .email {
+    font-size: 1.15rem;
+  }
+
+  .email a {
+    overflow-wrap: anywhere;
+  }
+
+  .office {
+    display: flex;
+    gap: 0.55rem;
+    font-style: normal;
+    white-space: pre-line;
+  }
+
+  .office :global(.icon) {
+    margin-top: 0.3rem;
+    color: var(--muted);
+  }
+</style>

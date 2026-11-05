@@ -1,0 +1,99 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import LinkList from '../components/LinkList.astro';
+import { getProfile, url } from '../lib/site';
+
+const profile = await getProfile();
+const { name, position, affiliation, email, photo, photoAlt, interests, links } = profile.data;
+const { Content } = await render(profile);
+const tagline = [position, affiliation].filter(Boolean).join(', ');
+---
+
+<Base>
+  <div class="intro">
+    <h1>{name}</h1>
+    {tagline && <p class="lede">{tagline}</p>}
+  </div>
+
+  <div class="home">
+    <aside class="profile" aria-label="Profile">
+      <Image
+        class="photo"
+        src={photo}
+        alt={photoAlt}
+        widths={[240, 360, 480, 720]}
+        sizes="(min-width: 44rem) 15rem, 8.5rem"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <LinkList email={email} links={links} cvHref={url('/cv')} />
+    </aside>
+
+    <div class="bio">
+      <Content />
+
+      {
+        interests.length > 0 && (
+          <section aria-labelledby="interests">
+            <h2 id="interests">Research interests</h2>
+            <ul>
+              {interests.map((i) => (
+                <li>{i}</li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+    </div>
+  </div>
+</Base>
+
+<style>
+  .intro {
+    margin-bottom: 1.75rem;
+  }
+
+  .home {
+    display: grid;
+    gap: 2rem;
+  }
+
+  /* Phones: photo and links side by side, so the bio starts near the top of the screen. */
+  .profile {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .bio :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .bio h2 {
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 44rem) {
+    .home {
+      grid-template-columns: 15rem minmax(0, 1fr);
+      gap: 3rem;
+    }
+
+    .profile {
+      grid-template-columns: 1fr;
+      align-content: start;
+    }
+  }
+</style>

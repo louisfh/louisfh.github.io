@@ -1,0 +1,60 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  email?: string;
+  links: { label: string; url: string }[];
+  cvHref?: string;
+}
+
+const { email, links, cvHref } = Astro.props;
+
+function iconFor(url: string): IconName {
+  const host = URL.canParse(url) ? new URL(url).hostname : '';
+  if (host.endsWith('github.com')) return 'github';
+  if (host.startsWith('scholar.google')) return 'scholar';
+  if (host.endsWith('orcid.org')) return 'orcid';
+  return 'link';
+}
+
+const items: { label: string; href: string; icon: IconName; text?: string }[] = [
+  ...(email ? [{ label: 'Email', href: `mailto:${email}`, icon: 'mail' as const, text: email }] : []),
+  ...(cvHref ? [{ label: 'CV', href: cvHref, icon: 'file' as const }] : []),
+  ...links.map((l) => ({ label: l.label, href: l.url, icon: iconFor(l.url) })),
+];
+---
+
+<ul class="links">
+  {
+    items.map((item) => (
+      <li>
+        <a href={item.href}>
+          <Icon name={item.icon} />
+          <span>{item.text ?? item.label}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.2rem 0;
+    overflow-wrap: anywhere;
+  }
+
+  a :global(.icon) {
+    color: var(--muted);
+  }
+</style>

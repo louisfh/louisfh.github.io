@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { getProfile, url } from '../lib/site';
+
+const { name } = (await getProfile()).data;
+const pdf = url('/cv.pdf');
+const fileName = `${name.replace(/[^\p{L}\p{N}]+/gu, '_')}_CV.pdf`;
+---
+
+<Base title="CV" description={`Curriculum vitae of ${name}.`}>
+  <h1>Curriculum vitae</h1>
+  <p class="actions">
+    <a class="button button--primary" href={pdf}>
+      <Icon name="file" size={16} />
+      Open PDF
+    </a>
+    <a class="button" href={pdf} download={fileName}>
+      <Icon name="download" size={16} />
+      Download
+    </a>
+  </p>
+
+  <!-- Embedded viewer on wide screens only; mobile PDF embeds show a single page or nothing. -->
+  <object class="viewer" data={`${pdf}#view=FitH`} type="application/pdf" aria-label={`CV of ${name} (PDF)`}>
+    <p>Your browser can't show the PDF here. <a href={pdf}>Open the CV</a> instead.</p>
+  </object>
+</Base>
+
+<style>
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .actions .button {
+    font-size: 1rem;
+    padding: 0.5em 1.1em;
+  }
+
+  .viewer {
+    display: none;
+  }
+
+  @media (min-width: 52rem) and (hover: hover) {
+    .viewer {
+      display: block;
+      width: 100%;
+      height: 85vh;
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+  }
+</style>

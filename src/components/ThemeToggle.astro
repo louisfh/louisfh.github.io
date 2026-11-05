@@ -1,0 +1,75 @@
+---
+import Icon from './Icon.astro';
+---
+
+<!-- Hidden until the script runs, so visitors without JavaScript just get their system theme. -->
+<button type="button" class="theme-toggle" hidden>
+  <span class="when-light"><Icon name="moon" /></span>
+  <span class="when-dark"><Icon name="sun" /></span>
+  <span class="visually-hidden label"></span>
+</button>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.theme-toggle')!;
+  const label = button.querySelector('.label')!;
+  const root = document.documentElement;
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  const current = () => root.dataset.theme ?? (systemDark.matches ? 'dark' : 'light');
+
+  function render() {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    label.textContent = `Switch to ${next} theme`;
+    button.dataset.showing = current();
+  }
+
+  button.addEventListener('click', () => {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      // Storage blocked (private mode etc.): the choice lasts for this page only.
+    }
+    render();
+  });
+  systemDark.addEventListener('change', render);
+
+  render();
+  button.hidden = false;
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .theme-toggle[hidden] {
+    display: none;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .when-light,
+  .when-dark {
+    display: none;
+    line-height: 0;
+  }
+
+  .theme-toggle[data-showing='light'] .when-light,
+  .theme-toggle[data-showing='dark'] .when-dark {
+    display: block;
+  }
+</style>

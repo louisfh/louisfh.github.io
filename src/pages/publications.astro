@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import Publication from '../components/Publication.astro';
+import { groupByYear, loadPublications } from '../lib/bibtex';
+import { getProfile } from '../lib/site';
+
+const profile = await getProfile();
+const pubs = loadPublications(profile.data.publicationNames);
+const groups = groupByYear(pubs);
+const scholar = profile.data.links.find((l) => l.url.includes('scholar.google'));
+---
+
+<Base title="Publications" description={`Publications by ${profile.data.name}.`}>
+  <h1>Publications</h1>
+  {
+    scholar && (
+      <p class="muted">
+        Also on <a href={scholar.url}>Google Scholar</a>.
+      </p>
+    )
+  }
+
+  {pubs.length === 0 && <p>No publications yet.</p>}
+
+  {
+    groups.map(([year, items]) => (
+      <section aria-labelledby={`y-${year}`}>
+        <h2 id={`y-${year}`}>{year}</h2>
+        <ol class="pubs">
+          {items.map((pub) => (
+            <Publication pub={pub} />
+          ))}
+        </ol>
+      </section>
+    ))
+  }
+</Base>
+
+<style>
+  .pubs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 48rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.35rem;
+    margin-bottom: 0;
+    max-width: 48rem;
+  }
+</style>
